@@ -1,0 +1,30 @@
+{
+  "name": "kral_playwright_academy_certification",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michalkral92/kral_playwright_academy_certification.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/michalkral92/kral_playwright_academy_certification/issues"
+  },
+  "homepage": "https://github.com/michalkral92/kral_playwright_academy_certification#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.27.0",
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.15.21",
+    "eslint": "^9.27.0",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.1.0",
+    "typescript-eslint": "^8.32.1"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.8.0"
+  }
+}
