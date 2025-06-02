@@ -126,13 +126,13 @@ export class DashboardPage {
     return this;
   }
 
-  async accountBalanceHasText(): Promise<this> {
-    await expect(this.accountBalance).toHaveText("10000.00 Kč");
+  async accountBalanceHasText(accountBalance): Promise<this> {
+    await expect(this.accountBalance).toHaveText(`${accountBalance} Kč`);
     return this;
   }
 
-  async accountTypeHasText(): Promise<this> {
-    await expect(this.accountType).toHaveText("Test");
+  async accountTypeHasText(accountType): Promise<this> {
+    await expect(this.accountType).toHaveText(accountType);
     return this;
   }
 }

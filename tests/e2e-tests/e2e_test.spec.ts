@@ -15,7 +15,12 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
   const password = faker.internet.password();
   const phoneNumber = faker.string.numeric(9);
   const age = faker.number.int({ min: 18, max: 70 });
-  const startBalance = faker.number.int({ min: 0, max: 999999 });
+  const startBalance = faker.number.float({
+    min: 0,
+    max: 999999,
+    multipleOf: 0.01,
+  });
+  const accountType = "Test";
 
   const loginPage = new LoginPage(page);
   const dashboardPage = new DashboardPage(page);
@@ -91,12 +96,11 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
       .then((profile) => profile.ageHasText(age));
   });
 
-  // Tady mi teď padá check na account balance, protože jsem původně zadával fixně 10000 a nyní generuji částku z fakeru
   await test.step("Account check", async () => {
     await dashboardPage
       .accountNumberIsVisible()
-      .then((account) => account.accountBalanceHasText())
-      .then((account) => account.accountTypeHasText());
+      .then((account) => account.accountBalanceHasText(startBalance))
+      .then((account) => account.accountTypeHasText(accountType));
   });
 
   await test.step("Log out", async () => {
