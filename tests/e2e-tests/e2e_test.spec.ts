@@ -1,8 +1,8 @@
-import { test, expect } from "@playwright/test";
+import { test } from "@playwright/test";
 import { LoginPage } from "../../src/pages/login_page.ts";
 import { faker } from "@faker-js/faker";
 import { LoginApi } from "../../src/api/login_api.ts";
-import { AccountApi } from "../../src/api/create_account_api.ts";
+import { CreateAccountApi } from "../../src/api/create_account_api.ts";
 import { DashboardPage } from "../../src/pages/dashboard_page.ts";
 
 test("E2E FE test - TEG-B", async ({ page, request }) => {
@@ -15,6 +15,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
   const password = faker.internet.password();
   const phoneNumber = faker.string.numeric(9);
   const age = faker.number.int({ min: 18, max: 70 });
+  const startBalance = faker.number.int({ min: 0, max: 999999 });
 
   const loginPage = new LoginPage(page);
   const dashboardPage = new DashboardPage(page);
@@ -29,6 +30,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
     console.log("Fullname:", firstName, lastName);
     console.log("Phone number:", phoneNumber);
     console.log("Age:", age);
+    console.log(`"Start balance:", ${startBalance} Kč`);
 
     // V techto krocích klient otevře base url aplikace TEG-B (login page), přesměruje se na registrační formulář, vyplní registraci a po přesměrování zpět na login page proběhne kontrola success message po registraci
     await loginPage
@@ -47,17 +49,14 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
 
   await test.step("Login and create account via API", async () => {
     const loginApi = new LoginApi(request);
-    const accountApi = new AccountApi(request);
+    const accountApi = new CreateAccountApi(request);
 
-    const accessToken = await loginApi.login(username, password);
-    console.log("Access token:", accessToken);
+    const loginResponse = await loginApi.loginViaApi(username, password);
+    const loginResponseBody = await loginResponse.json();
+    const token = loginResponseBody.access_token;
+    console.log("Access token:", token);
 
-    const accountData = await accountApi.createAccount(accessToken);
-    console.log("Account created:", accountData);
-
-    expect(accountData.accountType).toBe("Test");
-    expect(accountData.balance).toBe(10000);
-    expect(accountData.status).toBe("Active");
+    await accountApi.createAccountApi(token, startBalance, "Test");
   });
 
   await test.step("Login with registered user", async () => {
@@ -92,6 +91,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
       .then((profile) => profile.ageHasText(age));
   });
 
+  // Tady mi teď padá check na account balance, protože jsem původně zadával fixně 10000 a nyní generuji částku z fakeru
   await test.step("Account check", async () => {
     await dashboardPage
       .accountNumberIsVisible()

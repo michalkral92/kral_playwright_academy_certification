@@ -1,0 +1,26 @@
+[
+  {
+    "startBalance": 0,
+    "type": "DDTest"
+  },
+
+  {
+    "startBalance": 200000.52,
+    "type": "DDTest"
+  },
+
+  {
+    "startBalance": -12345,
+    "type": "DDTest"
+  },
+
+  {
+    "startBalance": -196000921,
+    "type": "DDTest"
+  },
+
+  {
+    "startBalance": 298000123,
+    "type": "DDTest"
+  }
+]
