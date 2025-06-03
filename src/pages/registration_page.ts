@@ -20,7 +20,7 @@ export class RegistrationPage {
     );
   }
 
-  async goto(): Promise<this> {
+  async goToRegisterPage(): Promise<this> {
     await this.page.goto(this.url);
     return this;
   }

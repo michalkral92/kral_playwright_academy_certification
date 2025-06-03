@@ -1,4 +1,4 @@
-import { test } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { LoginPage } from "../../src/pages/login_page.ts";
 import { faker } from "@faker-js/faker";
 import { LoginApi } from "../../src/api/login_api.ts";
@@ -59,9 +59,15 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
     const loginResponse = await loginApi.loginViaApi(username, password);
     const loginResponseBody = await loginResponse.json();
     const token = loginResponseBody.access_token;
-    console.log("Access token:", token);
+    expect(loginResponseBody.access_token).toBeDefined();
+    expect(loginResponse.status()).toBe(201);
 
-    await accountApi.createAccountApi(token, startBalance, accountType);
+    const createAccountResponse = await accountApi.createAccountApi(
+      token,
+      startBalance,
+      accountType
+    );
+    expect(createAccountResponse.status()).toBe(201);
   });
 
   await test.step("Login with registered user", async () => {
