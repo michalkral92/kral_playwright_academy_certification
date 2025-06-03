@@ -1,3 +1,9 @@
+/*
+V aplikaci je bug / specifické chování, kdy nejde založit účet s 9-ti cifernou sumou / 9-ti a více znakovým zůstatkem (např. - 196 000 921 Kč)
+
+To znamená, že při 4. a 5. běhu skončí API volání pro založení nového účtu statusem 500. Jelikož nemáme k dispozici analýzu, kde by byly definované veškeré podmínky zakládání účtu, tak nelze určit, zda je toto bug nebo chtěné chování.
+*/
+
 import { faker } from "@faker-js/faker";
 import { test, expect } from "@playwright/test";
 import { LoginPage } from "../../src/pages/login_page.ts";
@@ -8,6 +14,7 @@ import { CreateAccountApi } from "../../src/api/create_account_api.ts";
 test.describe("Data driven tests - create accounts with different account balances", () => {
   accountBalanceData.forEach((account) => {
     const { startBalance, type } = account;
+
     test(`Account balance: ${startBalance} Kč`, async ({ page, request }) => {
       const username = faker.internet.username();
       const emailDomain = "test.cz";
