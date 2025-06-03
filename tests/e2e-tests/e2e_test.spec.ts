@@ -45,8 +45,8 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
       .then((register) => register.typePassword(password))
       .then((register) => register.typeEmail(email))
       .then((register) => register.clickRegister())
-      .then((succesMessage) =>
-        succesMessage.successRegistrationMessageHasText(
+      .then((login) =>
+        login.successRegistrationMessageHasText(
           "🎉 Registrace úspěšná! Vítejte v TEG#B! 🎉"
         )
       );
@@ -61,7 +61,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
     const token = loginResponseBody.access_token;
     console.log("Access token:", token);
 
-    await accountApi.createAccountApi(token, startBalance, "Test");
+    await accountApi.createAccountApi(token, startBalance, accountType);
   });
 
   await test.step("Login with registered user", async () => {

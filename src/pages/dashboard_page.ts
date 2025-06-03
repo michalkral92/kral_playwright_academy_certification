@@ -29,6 +29,7 @@ export class DashboardPage {
   readonly accountNumberHeader: Locator;
   readonly accountBalanceHeader: Locator;
   readonly accountTypeHeader: Locator;
+  readonly accountSummary: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -67,6 +68,7 @@ export class DashboardPage {
     this.accountTypeHeader = page.locator(
       "//th[@data-testid='account-type-heading']"
     );
+    this.accountSummary = page.locator("//div[@data-testid='account-summary']");
   }
 
   async goto(): Promise<this> {
@@ -133,6 +135,11 @@ export class DashboardPage {
 
   async accountTypeHasText(accountType): Promise<this> {
     await expect(this.accountType).toHaveText(accountType);
+    return this;
+  }
+
+  async accountSummaryIsVisible(): Promise<this> {
+    await expect(this.accountSummary).toBeVisible();
     return this;
   }
 }

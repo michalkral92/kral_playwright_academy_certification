@@ -32,14 +32,5 @@ test.describe("Data driven tests - account balance", () => {
           "🎉 Registrace úspěšná! Vítejte v TEG#B! 🎉"
         )
       );
-
-    const loginApi = new LoginApi(request);
-    const accountApi = new AccountApi(request);
-
-    const accessToken = await loginApi.login(username, password);
-    console.log("Access token:", accessToken);
-
-    const accountData = await accountApi.createAccount(accessToken);
-    console.log("Account created:", accountData);
   });
 });
