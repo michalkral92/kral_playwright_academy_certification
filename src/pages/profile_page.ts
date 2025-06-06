@@ -1,4 +1,9 @@
-import { type Locator, type Page } from "@playwright/test";
+/*
+Nabízí se optimalizace locátorů všech inputů pro zminimalizování rizika nefunkčního lokátoru z důvodu překlepu. Inputy mají označení data-test-id viz vzoru:
+"//input[@data-testid='chage-email-input']" - překlep v označení "chage" namísto vhodného výrazu "change"
+*/
+
+import { type Locator, type Page, expect } from "@playwright/test";
 import { DashboardPage } from "./dashboard_page.ts";
 
 export class ProfilePage {
@@ -65,5 +70,25 @@ export class ProfilePage {
   async clickCancelChangesButton(): Promise<DashboardPage> {
     await this.saveChangesButton.click();
     return new DashboardPage(this.page);
+  }
+
+  async saveChangesButtonIsVisible(): Promise<this> {
+    await expect(this.saveChangesButton).toBeVisible();
+    return this;
+  }
+
+  async editProfile(
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone: string,
+    age: number
+  ): Promise<this> {
+    await this.typeFirstName(firstName);
+    await this.typeLastName(lastName);
+    await this.typeEmail(email);
+    await this.typePhone(phone);
+    await this.typeAge(age);
+    return this;
   }
 }

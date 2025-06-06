@@ -45,7 +45,7 @@ export class RegistrationPage {
     return new LoginPage(this.page);
   }
 
-  async register(
+  async successfullRegister(
     username: string,
     password: string,
     email: string

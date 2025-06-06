@@ -1,14 +1,33 @@
 import { test, expect } from "@playwright/test";
 import { LoginPage } from "../../src/pages/login_page.ts";
 import { DashboardPage } from "../../src/pages/dashboard_page.ts";
+import { RegistrationApi } from "../../src/api/registration_api.ts";
+import { faker } from "@faker-js/faker";
 
 test.describe("Dashboard page atomic tests", () => {
-  test.beforeEach("Go to dashboard through login", async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage
-      .goto()
-      .then((login) => login.login("tester01", "certifikace"));
-  });
+  test.beforeEach(
+    "Register and login unique user",
+    async ({ page, request }) => {
+      const registrationApi = new RegistrationApi(request);
+      const loginPage = new LoginPage(page);
+
+      const username = faker.internet.username();
+      const email = faker.internet.exampleEmail();
+      const password = faker.internet.password();
+
+      const registrationResponse = await registrationApi.registrationViaApi(
+        username,
+        password,
+        email
+      );
+      expect(registrationResponse.status()).toBe(201);
+
+      await loginPage
+        .goto()
+        .then((login) => login.login(username, password))
+        .then((dashboard) => dashboard.logoutButtonIsVisible());
+    }
+  );
 
   test("Left menu", async ({ page }) => {
     const dashboardPage = new DashboardPage(page);
@@ -72,27 +91,27 @@ test.describe("Dashboard page atomic tests", () => {
 
     await test.step("First name line", async () => {
       await expect.soft(dashboardPage.firstName).toBeVisible();
-      await expect.soft(dashboardPage.firstName).toContainText("Jméno:");
+      await expect.soft(dashboardPage.firstName).toHaveText("Jméno: N/A");
     });
 
     await test.step("Last name line", async () => {
       await expect.soft(dashboardPage.lastName).toBeVisible();
-      await expect.soft(dashboardPage.lastName).toContainText("Příjmení:");
+      await expect.soft(dashboardPage.lastName).toHaveText("Příjmení: N/A");
     });
 
     await test.step("Email line", async () => {
       await expect.soft(dashboardPage.email).toBeVisible();
-      await expect.soft(dashboardPage.email).toContainText("Email:");
+      await expect.soft(dashboardPage.email).toHaveText("Email: N/A");
     });
 
     await test.step("Phone line", async () => {
       await expect.soft(dashboardPage.phone).toBeVisible();
-      await expect.soft(dashboardPage.phone).toContainText("Telefon:");
+      await expect.soft(dashboardPage.phone).toHaveText("Telefon: N/A");
     });
 
     await test.step("Age line", async () => {
       await expect.soft(dashboardPage.age).toBeVisible();
-      await expect.soft(dashboardPage.age).toContainText("Věk:");
+      await expect.soft(dashboardPage.age).toHaveText("Věk: N/A");
     });
 
     await test.step("Edit profile button", async () => {

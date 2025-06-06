@@ -142,4 +142,9 @@ export class DashboardPage {
     await expect(this.accountSummary).toBeVisible();
     return this;
   }
+
+  async logoutButtonIsVisible(): Promise<this> {
+    await expect(this.logoutButton).toBeVisible();
+    return this;
+  }
 }

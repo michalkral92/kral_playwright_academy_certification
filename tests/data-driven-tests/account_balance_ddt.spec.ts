@@ -1,7 +1,13 @@
 /*
-V aplikaci je bug / specifické chování, kdy nejde založit účet s 9-ti cifernou sumou / 9-ti a více znakovým zůstatkem (např. - 196 000 921 Kč)
+V aplikaci je bug, kdy nejde založit účet s 9-ti cifernou sumou / 9-ti a více znakovým zůstatkem (např. - 196 000 921 Kč)
+To znamená, že při 4. a 5. běhu skončí API volání pro založení nového účtu statusem 500.
 
-To znamená, že při 4. a 5. běhu skončí API volání pro založení nového účtu statusem 500. Jelikož nemáme k dispozici analýzu, kde by byly definované veškeré podmínky zakládání účtu, tak nelze určit, zda je toto bug nebo chtěné chování.
+Očekávané chování: Mělo by dojít k založení účtu s požadovanou sumou.
+
+Kroky k replikaci:
+1) Otevřu Playwright UI 
+2) Spustím test s názvem "Data driven tests - create accounts with different account balances"
+pro Account balance: -196000921 Kč a Account balance 298000123 Kč
 */
 
 import { faker } from "@faker-js/faker";
@@ -10,6 +16,7 @@ import { LoginPage } from "../../src/pages/login_page.ts";
 import accountBalanceData from "../../src/ddt-tests-data/account_balance_data.json";
 import { LoginApi } from "../../src/api/login_api.ts";
 import { CreateAccountApi } from "../../src/api/create_account_api.ts";
+import { RegistrationApi } from "../../src/api/registration_api.ts";
 
 test.describe("Data driven tests - create accounts with different account balances", () => {
   accountBalanceData.forEach((account) => {
@@ -17,26 +24,20 @@ test.describe("Data driven tests - create accounts with different account balanc
 
     test(`Account balance: ${startBalance} Kč`, async ({ page, request }) => {
       const username = faker.internet.username();
-      const emailDomain = "test.cz";
-      const email = `${username}@${emailDomain}`;
+      const email = faker.internet.exampleEmail();
       const password = faker.internet.password();
 
       const loginPage = new LoginPage(page);
+      const registrationApi = new RegistrationApi(request);
       const loginApi = new LoginApi(request);
 
-      await test.step("Unique user registration", async () => {
-        await loginPage
-          .goto()
-          .then((login) => login.clickRegistration())
-          .then((register) => register.typeUsername(username))
-          .then((register) => register.typePassword(password))
-          .then((register) => register.typeEmail(email))
-          .then((register) => register.clickRegister())
-          .then((login) =>
-            login.successRegistrationMessageHasText(
-              "🎉 Registrace úspěšná! Vítejte v TEG#B! 🎉"
-            )
-          );
+      await test.step("Register unique user via API", async () => {
+        const registrationResponse = await registrationApi.registrationViaApi(
+          username,
+          password,
+          email
+        );
+        expect(registrationResponse.status()).toBe(201);
 
         console.log("Registered user:");
         console.log("Username:", username);
@@ -44,7 +45,7 @@ test.describe("Data driven tests - create accounts with different account balanc
         console.log("Password:", password);
       });
 
-      await test.step("Creating account via API", async () => {
+      await test.step("Login and creating account via API", async () => {
         const loginResponse = await loginApi.loginViaApi(username, password);
         const loginResponseBody = await loginResponse.json();
         const token = loginResponseBody.access_token;

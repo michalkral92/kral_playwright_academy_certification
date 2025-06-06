@@ -10,8 +10,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
   const username = `${firstName.toLowerCase()}.${lastName.toLowerCase()}`;
-  const emailDomain = "test.cz";
-  const email = `${username}@${emailDomain}`;
+  const email = faker.internet.exampleEmail();
   const password = faker.internet.password();
   const phoneNumber = faker.string.numeric(9);
   const age = faker.number.int({ min: 18, max: 70 });
@@ -41,10 +40,9 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
     await loginPage
       .goto()
       .then((login) => login.clickRegistration())
-      .then((register) => register.typeUsername(username))
-      .then((register) => register.typePassword(password))
-      .then((register) => register.typeEmail(email))
-      .then((register) => register.clickRegister())
+      .then((register) =>
+        register.successfullRegister(username, password, email)
+      )
       .then((login) =>
         login.successRegistrationMessageHasText(
           "🎉 Registrace úspěšná! Vítejte v TEG#B! 🎉"
@@ -80,11 +78,10 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
   await test.step("Editing profile", async () => {
     await dashboardPage
       .clickEditProfile()
-      .then((editProfile) => editProfile.typeFirstName(firstName))
-      .then((editProfile) => editProfile.typeLastName(lastName))
-      .then((editProfile) => editProfile.typeEmail(email))
-      .then((editProfile) => editProfile.typePhone(phoneNumber))
-      .then((editProfile) => editProfile.typeAge(age))
+      .then((editProfile) => editProfile.saveChangesButtonIsVisible())
+      .then((editProfile) =>
+        editProfile.editProfile(firstName, lastName, email, phoneNumber, age)
+      )
       .then((editProfile) => editProfile.clickSaveChangesButton())
       .then((updateMessage) =>
         updateMessage.successUpdateMessageHasText(
