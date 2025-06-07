@@ -5,8 +5,8 @@ import { LoginApi } from "../../src/api/login_api.ts";
 import { CreateAccountApi } from "../../src/api/create_account_api.ts";
 import { DashboardPage } from "../../src/pages/dashboard_page.ts";
 
+// Vygenerování unikátních osobních údajů pomocí Faker
 test("E2E FE test - TEG-B", async ({ page, request }) => {
-  // Vygenerování osobních údajů pomocí Faker
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
   const username = `${firstName.toLowerCase()}.${lastName.toLowerCase()}`;
@@ -24,9 +24,8 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
   const loginPage = new LoginPage(page);
   const dashboardPage = new DashboardPage(page);
 
+  // Vypsání vygenerovaných údajů do console pro další práci s klientem
   await test.step("Register user", async () => {
-    // Vypsání vygenerovaných údajů do console pro další práci s klientem
-
     console.log("Registered user:");
     console.log("Username:", username);
     console.log("Email:", email);
@@ -36,7 +35,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
     console.log("Age:", age);
     console.log(`"Start balance:", ${startBalance} Kč`);
 
-    // V techto krocích klient otevře base url aplikace TEG-B (login page), přesměruje se na registrační formulář, vyplní registraci a po přesměrování zpět na login page proběhne kontrola success message po registraci
+    // Otevření base url aplikace TEG-B (login page), přesměrování na registrační formulář, úspěšná registrace, po přesměrování zpět na login page kontrola success message po registraci
     await loginPage
       .goto()
       .then((login) => login.clickRegistration())
@@ -50,6 +49,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
       );
   });
 
+  // Login pomocí API, odchycení vygenerovaného access tokenu a vytvoření účtu pomocí API + kontrola volání
   await test.step("Login and create account via API", async () => {
     const loginApi = new LoginApi(request);
     const accountApi = new CreateAccountApi(request);
@@ -68,6 +68,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
     expect(createAccountResponse.status()).toBe(201);
   });
 
+  // Přihlášení klienta přes FE + kontrola zobrazení dashboard
   await test.step("Login with registered user", async () => {
     await loginPage
       .goto()
@@ -75,6 +76,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
       .then((dashboard) => dashboard.dashboardTitleHasText("TEG#B Dashboard"));
   });
 
+  // Vyplnění profilu + kontrola success update message
   await test.step("Editing profile", async () => {
     await dashboardPage
       .clickEditProfile()
@@ -90,6 +92,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
       );
   });
 
+  // Kontrola vyplněných údajů v profilu
   await test.step("Profile check", async () => {
     await dashboardPage
       .firstNameHasText(firstName)
@@ -99,6 +102,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
       .then((profile) => profile.ageHasText(age));
   });
 
+  // Kontrola správného zobrazení účtu
   await test.step("Account check", async () => {
     await dashboardPage
       .accountNumberIsVisible()
@@ -106,6 +110,7 @@ test("E2E FE test - TEG-B", async ({ page, request }) => {
       .then((account) => account.accountTypeHasText(accountType));
   });
 
+  // Odhlášení + kontrola úspěšného odhlášení
   await test.step("Log out", async () => {
     await dashboardPage
       .clickLogout()
